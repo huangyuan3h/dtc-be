@@ -16,6 +16,7 @@ export default {
       const api = new Api(stack, "api", {
         routes: {
           "GET /": "api/health-check/main.go",
+          "POST /gql": "api/gql/main.go",
         },
       });
       stack.addOutputs({

@@ -3,13 +3,21 @@ package main
 import (
 	"encoding/json"
 
+	"net/http"
+
 	"log"
+
+	"api.it-t.xyz/utils/errors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/graphql-go/graphql"
 )
 
+
+type QueryResponse struct {
+	Query    string `json:"query"`
+}
 
 
 func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
@@ -28,13 +36,16 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 		log.Fatalf("failed to create new schema, error: %v", err)
 	}
 
-	// Query
-	query := `
-		{
-			hello
-		}
-	`
-	params := graphql.Params{Schema: schema, RequestString: query}
+	bodyStr := request.Body
+
+	var response QueryResponse
+	err = json.Unmarshal([]byte(bodyStr), &response)
+
+	if err != nil {
+		return errors.New("Failed to create user", http.StatusInternalServerError).GatewayResponse()
+	}
+
+	params := graphql.Params{Schema: schema, RequestString: response.Query}
 	r := graphql.Do(params)
 	if len(r.Errors) > 0 {
 		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)

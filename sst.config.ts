@@ -1,5 +1,7 @@
 import { SSTConfig } from "sst";
 import { Api } from "sst/constructs";
+import { getDynamodb } from "./cdk/dynamodb";
+import Api from "./cdk/api";
 
 export default {
   config(_input) {
@@ -13,12 +15,11 @@ export default {
       runtime: "go",
     });
     app.stack(function Stack({ stack }) {
-      const api = new Api(stack, "api", {
-        routes: {
-          "GET /": "api/health-check/main.go",
-          "POST /gql": "api/gql/main.go",
-        },
-      });
+      const { auth, user, token } = getDynamodb(stack);
+
+      const api = Api(stack);
+      api.attachPermissions([auth, user, token]);
+
       stack.addOutputs({
         ApiEndpoint: api.url,
       });

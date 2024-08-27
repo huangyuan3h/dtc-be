@@ -1,4 +1,4 @@
-module api.it-t.xyz/utils
+module utils
 
 go 1.22.0
 

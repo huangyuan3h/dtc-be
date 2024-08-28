@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"services/email_service"
 	"services/token_manager"
 	errs "utils/errors"
 	awsHttp "utils/http"
@@ -45,8 +46,18 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 	// create a token
 	tokenService := token_manager.New()
 
-	token := tokenService.CreateToken(registerBody.Email)
+	token, err := tokenService.CreateToken(&registerBody.Email)
+	if err != nil {
+		return errs.New(err.Error(), http.StatusBadRequest).GatewayResponse()
+	}
 	// send email
+
+	err = email_service.SendEmailWithResend(email_service.SendMessageBody{
+		Subject:   "register to it and tea",
+		Content:   "please click the link below: " + token,
+		ToEmail:   registerBody.Email,
+		FromEmail: "admin@it-t.xyz",
+	})
 
 	return awsHttp.Ok(RegisterResponse{Token: token}, http.StatusCreated)
 }

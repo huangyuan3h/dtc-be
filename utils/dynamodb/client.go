@@ -14,7 +14,7 @@ import (
 )
 
 const STAGE_KEY = "SST_STAGE"
-const PROJECT_STR = "-north-path-api-"
+const PROJECT_STR = "-dtc-common-be-"
 
 type Client struct {
 	TableName *string

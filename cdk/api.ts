@@ -10,7 +10,13 @@ export default (stack: Stack) => {
     routes: {
       "GET /": "api/health-check/main.go",
       "POST /gql": "api/gql/main.go",
-      "POST /register": "api/auth/register/main.go",
+      "POST /register": {
+        function: {
+          handler: "api/auth/register/main.go",
+          timeout: 10,
+          environment: { EmailToken: process.env.EmailToken ?? "" },
+        },
+      },
     },
   });
   return api;

@@ -53,11 +53,14 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 	// send email
 
 	err = email_service.SendEmailWithResend(email_service.SendMessageBody{
-		Subject:   "register to it and tea",
-		Content:   "please click the link below: " + token,
-		ToEmail:   registerBody.Email,
-		FromEmail: "admin@it-t.xyz",
+		Subject: "register to it and tea",
+		Content: "please click the link below: " + token,
+		ToEmail: registerBody.Email,
 	})
+
+	if err != nil {
+		return errs.New(err.Error(), http.StatusBadRequest).GatewayResponse()
+	}
 
 	return awsHttp.Ok(RegisterResponse{Token: token}, http.StatusCreated)
 }

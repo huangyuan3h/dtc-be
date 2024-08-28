@@ -21,14 +21,13 @@ func SendEmailWithResend(data SendMessageBody) error {
 		firstErr := errStruct.(validator.ValidationErrors)[0]
 		var errMessage string
 		switch t := firstErr.StructField(); t {
-		case "FromEmail":
+		case "ToEmail":
 			errMessage = errs.NotValidEmail
 		case "Subject":
 			errMessage = errs.SubjectInvalid
 		case "Content":
 			errMessage = errs.ContentInvalid
 		}
-
 		return errors.New(errMessage)
 	}
 
@@ -37,7 +36,7 @@ func SendEmailWithResend(data SendMessageBody) error {
 	client := resend.NewClient(apiKey)
 
 	params := &resend.SendEmailRequest{
-		From:    "admin@it-t.xyz",
+		From:    "admin@north-path.site",
 		To:      []string{data.ToEmail},
 		Subject: data.Subject,
 		Html:    data.Content,

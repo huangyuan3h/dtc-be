@@ -7,6 +7,7 @@ import (
 
 	"log"
 
+	"api.it-t.xyz/gql/schema"
 	"api.it-t.xyz/utils/errors"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -16,40 +17,31 @@ import (
 
 
 type QueryResponse struct {
-	Query    string `json:"query"`
+	Query string `json:"query"`
 }
 
-
 func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
-	fields := graphql.Fields{
-		"hello": &graphql.Field{
-			Type: graphql.String,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return "world", nil
-			},
-		},
-	}
-	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
-	schemaConfig := graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)}
-	schema, err := graphql.NewSchema(schemaConfig)
+	schema, err := schema.CreateSchema()
 	if err != nil {
 		log.Fatalf("failed to create new schema, error: %v", err)
 	}
 
+	// 处理请求
 	bodyStr := request.Body
-
 	var response QueryResponse
 	err = json.Unmarshal([]byte(bodyStr), &response)
 
 	if err != nil {
-		return errors.New("Failed to create user", http.StatusInternalServerError).GatewayResponse()
+		return errors.New("request is invalid", http.StatusInternalServerError).GatewayResponse()
 	}
 
 	params := graphql.Params{Schema: schema, RequestString: response.Query}
 	r := graphql.Do(params)
 	if len(r.Errors) > 0 {
 		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
+		return errors.New("invalid query", http.StatusInternalServerError).GatewayResponse()
 	}
+
 	rJSON, _ := json.Marshal(r)
 	return events.APIGatewayProxyResponse{
 		Body:      string(rJSON),

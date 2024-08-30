@@ -7,14 +7,14 @@ import (
 
 	"log"
 
+	"utils/errors"
+
 	"api.it-t.xyz/gql/schema"
-	"api.it-t.xyz/utils/errors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/graphql-go/graphql"
 )
-
 
 type QueryResponse struct {
 	Query string `json:"query"`
@@ -44,7 +44,7 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 
 	rJSON, _ := json.Marshal(r)
 	return events.APIGatewayProxyResponse{
-		Body:      string(rJSON),
+		Body:       string(rJSON),
 		StatusCode: 200,
 	}, nil
 }

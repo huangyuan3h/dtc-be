@@ -26,4 +26,8 @@ const (
 
 	// common
 	DBProcessError = "db process error"
+
+	TokenNotFound   = "token not found"
+	TokenConsumed   = "token is already consumed"
+	TokenHasExpired = "Token has expired"
 )

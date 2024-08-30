@@ -17,6 +17,12 @@ export default (stack: Stack) => {
           environment: { EmailToken: process.env.EmailToken ?? "" },
         },
       },
+      "POST /verify-email-token": {
+        function: {
+          handler: "api/auth/verify-email-token/main.go",
+          timeout: 10,
+        },
+      },
     },
   });
   return api;

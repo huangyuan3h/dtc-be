@@ -21,6 +21,7 @@ type TokenDB struct {
 type TokenMethod interface {
 	CreateToken(email *string, expireAt ...time.Time) (string, error)
 	ConsumeToken(tokenId *string) error
+	SearchToken(tokenId *string) (Token, error)
 }
 
 const tableName = "token"
@@ -64,19 +65,13 @@ func generateULID() string {
 
 func (t TokenDB) ConsumeToken(tokenId *string) error {
 
-	item, err := t.client.FindById("tokenId", *tokenId)
-
+	token, err := t.SearchToken(tokenId)
 	if err != nil {
-		return errors.New("not able to find tokenId" + *tokenId)
-	}
-	var token = Token{}
-	err = attributevalue.UnmarshalMap(item, &token)
-	if err != nil {
-		return errors.New(errs.UnmarshalError)
+		return err
 	}
 
 	if token.IsConsumed != "false" {
-		return errors.New("token is already consumed")
+		return errors.New(errs.TokenConsumed)
 	}
 
 	token.IsConsumed = "true"
@@ -87,4 +82,19 @@ func (t TokenDB) ConsumeToken(tokenId *string) error {
 	}
 
 	return nil
+}
+
+func (t TokenDB) SearchToken(tokenId *string) (Token, error) {
+	item, err := t.client.FindById("tokenId", *tokenId)
+	var token = Token{}
+	if err != nil {
+		return token, errors.New(errs.TokenNotFound + *tokenId)
+	}
+
+	err = attributevalue.UnmarshalMap(item, &token)
+	if err != nil {
+		return token, errors.New(errs.UnmarshalError)
+	}
+
+	return token, nil
 }

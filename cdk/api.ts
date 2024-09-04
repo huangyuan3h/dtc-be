@@ -3,7 +3,7 @@ import { Api, Stack } from "sst/constructs";
 export default (stack: Stack) => {
   const api = new Api(stack, "api", {
     cors: {
-      allowOrigins: ["http://localhost:3000"],
+      allowOrigins: ["http://localhost:3000", "https://www.it-t.xyz"],
       allowCredentials: true,
       allowHeaders: ["Authorization"],
     },

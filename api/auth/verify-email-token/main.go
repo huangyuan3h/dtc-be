@@ -39,8 +39,8 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 		firstErr := errStruct.(validator.ValidationErrors)[0]
 		var errMessage string
 		switch t := firstErr.StructField(); t {
-		case "Email":
-			errMessage = errs.NotValidEmail
+		case "Token":
+			errMessage = errs.TokenIdInvalid
 		}
 
 		return errs.New(errMessage, http.StatusBadRequest).GatewayResponse()

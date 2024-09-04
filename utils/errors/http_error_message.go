@@ -30,4 +30,5 @@ const (
 	TokenNotFound   = "token not found"
 	TokenConsumed   = "token is already consumed"
 	TokenHasExpired = "Token has expired"
+	TokenIdInvalid  = "Token Id Invalid"
 )

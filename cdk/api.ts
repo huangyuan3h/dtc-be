@@ -23,6 +23,16 @@ export default (stack: Stack) => {
           timeout: 10,
         },
       },
+      "POST /create-account": {
+        function: {
+          handler: "api/auth/create-account/main.go",
+          timeout: 10,
+          environment: {
+            AUTH_SECRET: process.env.AUTH_SECRET ?? "",
+            JWT_SECRET: process.env.JWT_SECRET ?? "",
+          },
+        },
+      },
     },
   });
   return api;

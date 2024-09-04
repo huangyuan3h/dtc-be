@@ -4,9 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+	"services/account"
+	"services/profile"
 	"services/token_manager"
 	errs "utils/errors"
 	awsHttp "utils/http"
+
+	"utils/jwt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -20,7 +24,7 @@ type CreateAccountBody struct {
 }
 
 type CreateAccountResponse struct {
-	Message string `json:"message"`
+	Authorization string `json:"Authorization"`
 }
 
 func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
@@ -59,15 +63,43 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 
 	// consume token
 	tokenService := token_manager.New()
-	err = tokenService.ConsumeToken(&createAccountBody.Token)
+	token, err := tokenService.ConsumeToken(&createAccountBody.Token)
 	if err != nil {
 		return errs.New(err.Error(), http.StatusBadRequest).GatewayResponse()
 	}
 	// create account
-
+	authService := account.New()
+	err = authService.CreateAccount(&createAccountBody.Name, &createAccountBody.Password)
+	if err != nil {
+		return errs.New(errs.InsertDBError, http.StatusBadRequest).GatewayResponse()
+	}
 	// create profile
+	profileService := profile.New()
 
-	return awsHttp.Ok(CreateAccountResponse{Message: ""}, http.StatusOK)
+	u := profile.User{
+		Email:    token.ConsumedBy,
+		UserName: createAccountBody.Name,
+	}
+
+	err = profileService.CreateNew(&u)
+
+	if err != nil {
+		return errs.New(errs.InsertDBError, http.StatusBadRequest).GatewayResponse()
+	}
+
+	// login to system using the email and password
+	jwtObj := map[string]interface{}{
+		"email":    token.ConsumedBy,
+		"avatar":   u.Avatar,
+		"userName": u.UserName,
+	}
+	jwt_token, err := jwt.CreateToken(jwtObj)
+
+	if err != nil {
+		return errs.New(err.Error(), http.StatusInternalServerError).GatewayResponse()
+	}
+
+	return awsHttp.Ok(CreateAccountResponse{Authorization: jwt_token}, http.StatusOK)
 }
 
 func main() {

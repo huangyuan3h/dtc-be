@@ -22,7 +22,7 @@ func TestConsume(t *testing.T) {
 
 	tokenClient := New()
 
-	err := tokenClient.ConsumeToken(&token)
+	_, err := tokenClient.ConsumeToken(&token)
 
 	if err != nil {
 		t.Error(err)

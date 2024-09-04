@@ -20,7 +20,7 @@ type TokenDB struct {
 
 type TokenMethod interface {
 	CreateToken(email *string, expireAt ...time.Time) (string, error)
-	ConsumeToken(tokenId *string) error
+	ConsumeToken(tokenId *string) (Token, error)
 	SearchToken(tokenId *string) (Token, error)
 }
 
@@ -63,25 +63,25 @@ func generateULID() string {
 	return id.String()
 }
 
-func (t TokenDB) ConsumeToken(tokenId *string) error {
+func (t TokenDB) ConsumeToken(tokenId *string) (Token, error) {
 
 	token, err := t.SearchToken(tokenId)
 	if err != nil {
-		return err
+		return token, err
 	}
 
 	if token.IsConsumed != "false" {
-		return errors.New(errs.TokenConsumed)
+		return token, errors.New(errs.TokenConsumed)
 	}
 
 	token.IsConsumed = "true"
 
 	err = t.client.CreateOrUpdate(token)
 	if err != nil {
-		return errors.New(errs.DBProcessError)
+		return token, errors.New(errs.DBProcessError)
 	}
 
-	return nil
+	return token, nil
 }
 
 func (t TokenDB) SearchToken(tokenId *string) (Token, error) {

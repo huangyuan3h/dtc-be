@@ -73,6 +73,18 @@ func (a Auth) VerifyLogin(email, password *string) error {
 		return errors.New(errs.AccountNotExist)
 	}
 
+	account := Account{}
+
+	err = attributevalue.UnmarshalMap(item, &account)
+
+	if err != nil {
+		return err
+	}
+
+	if account.Status != "actived" {
+		return errors.New(errs.AccountIsNotActive)
+	}
+
 	err = attributevalue.UnmarshalMap(item, &a)
 	if err != nil {
 		return errors.New(errs.UnmarshalError)

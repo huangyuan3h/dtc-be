@@ -13,6 +13,7 @@ const (
 
 	// Login error message
 	AccountNotExist        = "account not exist"
+	AccountIsNotActive     = "account is not active"
 	PasswordDecryptedError = "password decrypt error"
 	PasswordIncorrect      = "password incorrect"
 	UserProfileNotFound    = "user profile not found"

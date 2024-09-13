@@ -32,7 +32,6 @@ require (
 	github.com/aws/smithy-go v1.20.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/oklog/ulid/v2 v2.1.0 // indirect
 )
 
 require (

@@ -35,7 +35,7 @@ func CreateToken(in map[string]interface{}) (string, error) {
 		return "", err
 	}
 	claim := make(jwt.MapClaims, len(in)+2) // add issuer and expires
-	claim["iss"] = "http://north-path.site"
+	claim["iss"] = "http://it-t.xyz"
 	claim["exp"] = time.Now().Add(time.Hour * 24 * 365).Unix() // not expired in one year
 	for key, value := range in {
 		claim[key] = value

@@ -33,6 +33,16 @@ export default (stack: Stack) => {
           },
         },
       },
+      "POST /login": {
+        function: {
+          handler: "api/auth/login/main.go",
+          timeout: 10,
+          environment: {
+            AUTH_SECRET: process.env.AUTH_SECRET ?? "",
+            JWT_SECRET: process.env.JWT_SECRET ?? "",
+          },
+        },
+      },
     },
   });
   return api;

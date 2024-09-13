@@ -69,7 +69,7 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 	}
 	// create account
 	authService := account.New()
-	err = authService.CreateAccount(&createAccountBody.Name, &createAccountBody.Password)
+	err = authService.CreateAccount(&token.ConsumedBy, &createAccountBody.Password)
 	if err != nil {
 		return errs.New(errs.InsertDBError, http.StatusBadRequest).GatewayResponse()
 	}

@@ -75,7 +75,7 @@ func Handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 		return errs.New(err.Error(), http.StatusInternalServerError).GatewayResponse()
 	}
 
-	return awsHttp.Ok(LoginResponse{Authorization: jwt_token}, http.StatusOK)
+	return awsHttp.Auth(jwt_token)
 }
 
 func main() {

@@ -2,6 +2,8 @@ package http
 
 import (
 	"encoding/json"
+	"os"
+	"time"
 
 	"net/http"
 
@@ -35,4 +37,33 @@ func ResponseWithHeader(obj any, code int, header map[string]string) (events.API
 		StatusCode: code,
 		Headers:    header,
 	}, nil
+}
+
+func isProduction() bool {
+	stage := os.Getenv("SST_STAGE")
+	return stage == "production"
+}
+
+func Auth(token string) (events.APIGatewayProxyResponse, error) {
+	domain := "localhost"
+
+	if isProduction() {
+		domain = ".it-t.xyz"
+	}
+
+	cookie := http.Cookie{
+		Name:     "Authorization",
+		Value:    token,
+		Path:     "/",
+		Domain:   domain,
+		Expires:  time.Now().Add(30 * 24 * time.Hour),
+		Secure:   true,
+		HttpOnly: false,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	return ResponseWithHeader(map[string]string{"Authorization": token}, http.StatusOK, map[string]string{
+		"Set-Cookie":   cookie.String(),
+		"Content-Type": "application/json",
+	})
 }

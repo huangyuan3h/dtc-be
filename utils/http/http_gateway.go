@@ -45,10 +45,12 @@ func isProduction() bool {
 }
 
 func Auth(token string) (events.APIGatewayProxyResponse, error) {
-	domain := "localhost"
+	domain := ""
+	sameSite := http.SameSiteNoneMode
 
 	if isProduction() {
 		domain = ".it-t.xyz"
+		sameSite = http.SameSiteLaxMode
 	}
 
 	cookie := http.Cookie{
@@ -59,7 +61,7 @@ func Auth(token string) (events.APIGatewayProxyResponse, error) {
 		Expires:  time.Now().Add(30 * 24 * time.Hour),
 		Secure:   true,
 		HttpOnly: false,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: sameSite,
 	}
 
 	return ResponseWithHeader(map[string]string{"Authorization": token}, http.StatusOK, map[string]string{

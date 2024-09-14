@@ -56,6 +56,17 @@ export default (stack: Stack) => {
           },
         },
       },
+      "POST /google-login": {
+        function: {
+          handler: "api/auth/google-login/main.go",
+          timeout: 10,
+          environment: {
+            AVATAR_BUCKET_NAME: process.env.AVATAR_BUCKET_NAME ?? "",
+            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? "",
+            JWT_SECRET: process.env.JWT_SECRET ?? "",
+          },
+        },
+      },
     },
   });
   return api;

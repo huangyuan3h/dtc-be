@@ -1,6 +1,7 @@
 go 1.22.0
 
 use (
+	./api/auth/google-login
 	./api/auth/login
 	./api/auth/register
 	./api/auth/verify-email-token
